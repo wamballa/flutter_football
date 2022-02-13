@@ -4,43 +4,49 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-class TableScreen extends StatefulWidget {
+class TestScreen extends StatefulWidget {
   final String code;
 
   // const TableScreen({required Key key, required this.code}) : super(key: key);
 
-  const TableScreen ({required this.code});
+  const TestScreen ({required this.code});
 
 
   @override
-  _TableScreenState createState() => _TableScreenState();
+  _TestScreenState createState() => _TestScreenState();
 }
 
-class _TableScreenState extends State<TableScreen> {
+class _TestScreenState extends State<TestScreen> {
 
   List _table = [];
 
   getTable() async {
-    // http.Response response = await http.get(
-    //     'https://api.football-data.org/v2/competitions/${widget.code}/standings',
-    //     headers: {'X-Auth-Token': 'e4c06911610d4282969921e96479154a'});
 
-    print ("widget "+widget.toString());
+    print ("TEST SCREEN "+ widget.code);
+
+    // var uri = Uri.https('api.football-data.org',
+    //     '/v2/competitions/${widget.code}/standings');
+
+    String now = DateFormat("yyyy-MM-dd").format(DateTime.now());
+
+    print ('Time = '+now);
 
     var uri = Uri.https('api.football-data.org',
-        '/v2/competitions/${widget.code}/standings');
+        '/v2/competitions/2021/matches');
+
     var response1 = await http.get(uri,
         headers: {'X-Auth-Token': 'e4c06911610d4282969921e96479154a'});
 
-
-
-    // String body = response.body;
-
     String body = response1.body;
-
+    print('body'+body);
     Map data = jsonDecode(body);
-    List table = data['standings'][0]['table'];
+
+    List table = data['matches'];
+
+    print ( table[0]['id']  );
+
     setState(() {
       _table = table;
     });
@@ -199,7 +205,9 @@ class _TableScreenState extends State<TableScreen> {
             SizedBox(
               height: 10,
             ),
-            buildTable(),
+
+            // buildTable(),
+
           ],
         ),
       ),

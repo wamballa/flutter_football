@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football_api/Screens/tablescreen.dart';
+import 'package:flutter_football_api/Screens/testscreen.dart';
 import 'package:flutter_football_api/Widgets/LeagueContainer.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -56,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TableScreen(code: 'PD'),
+                              builder: (context) => TestScreen(code: '2021'),
                             ));
                       },
                     ),
