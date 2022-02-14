@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
@@ -20,41 +19,86 @@ class TestScreen extends StatefulWidget {
 
 class _TestScreenState extends State<TestScreen> {
 
-  List _table = [];
+  List _matches = [];
+  List _teams = [];
+  var _teamWins = Map<String, int>();
 
-  getTable() async {
-
-    print ("TEST SCREEN "+ widget.code);
-
-    // var uri = Uri.https('api.football-data.org',
-    //     '/v2/competitions/${widget.code}/standings');
+  Future<bool> getMatches() async {
+    print (">> Getting matches in competition..."+ widget.code);
 
     String now = DateFormat("yyyy-MM-dd").format(DateTime.now());
-
-    print ('Time = '+now);
+    String thirtyDaysAgo = DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(Duration(days: 30)));
 
     var uri = Uri.https('api.football-data.org',
-        '/v2/competitions/2021/matches');
-
-    var response1 = await http.get(uri,
+        '/v2/competitions/${widget.code}/matches',
+        {'q': 'dateFrom=${thirtyDaysAgo}&dateTo=${now}'});
+    var matchesResponse = await http.get(uri,
         headers: {'X-Auth-Token': 'e4c06911610d4282969921e96479154a'});
+    String body = matchesResponse.body;
+    Map matchesData = jsonDecode(body);
+    List matches = matchesData['matches'];
 
-    String body = response1.body;
-    print('body'+body);
-    Map data = jsonDecode(body);
+    // print("Matches "+ matches.toString());
 
-    List table = data['matches'];
-
-    print ( table[0]['id']  );
+    // _matches = matches;
 
     setState(() {
-      _table = table;
+      _matches = matches;
     });
+    return true;
+  }
+
+  getTeams() async {
+    print (">> Getting teams in competition...");
+    var uri = Uri.https('api.football-data.org',
+        '/v2/competitions/${widget.code}/teams');
+    var teamsResponse = await http.get(uri,
+        headers: {'X-Auth-Token': 'e4c06911610d4282969921e96479154a'});
+    String teamsBody = teamsResponse.body;
+    Map teamsData = jsonDecode(teamsBody);
+    List teams = teamsData['teams'];
+    for (var team in teams){
+      _teamWins[team['name']]= 0;
+    }
+    // _teams = teams;
+    setState(() {
+      _teams = teams;
+    });
+  }
+
+  getWinningTeam() async {
+    print (">> Getting winning team in competition...");
+    bool hasData = await getMatches();
+
+    for (var match in _matches){
+
+      String result = match['score']['winner'];
+      String winningTeamID;
+
+      if (result == 'HOME_TEAM'){
+        winningTeamID = match['homeTeam']['name'];
+      }
+      else if (result == 'AWAY_TEAM'){
+        winningTeamID = match['awayTeam']['name'];
+      }
+      else break;
+
+      // print ('winning team ID '+ winningTeamID.toString());
+
+      _teamWins.update(winningTeamID, (value) => value + 1);
+
+    }
+
+    // print (_teamWins);
+    // _teamWins.forEach((key, value) {
+    //   print ( key + ' ' + value.toString());
+    // });
+
   }
 
   Widget buildTable() {
     List<Widget> teams = [];
-    for (var team in _table) {
+    for (var team in _matches) {
       teams.add(
         Padding(
           padding: const EdgeInsets.all(10),
@@ -107,15 +151,59 @@ class _TestScreenState extends State<TestScreen> {
     );
   }
 
+  Widget showTeams(){
+    List<Widget> teams = [];
+    // for (var team in _teamWins){
+
+    _teamWins.forEach((clubName, value) {
+      teams.add(
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Expanded(
+                  child: Row(
+                    children: [
+                      Text(clubName),
+
+                ],
+              )
+              ),
+              SizedBox(
+                width: 1,
+              ),
+              Expanded(
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children:[
+                    Text(value.toString())
+              ]
+
+                ),
+              )
+            ],
+          ),
+        )
+      );
+    });
+
+    return Column(
+      children: teams,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
-    getTable();
+    print ("Initiating");
+    getMatches();
+    getTeams();
+    getWinningTeam();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _table == null
+    return _matches == null
         ? Container(
       color: Colors.white,
       child: Center(
@@ -154,10 +242,6 @@ class _TestScreenState extends State<TestScreen> {
                   Expanded(
                     child: Row(
                       children: [
-                        Text(
-                          'Pos',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
                         SizedBox(
                           width: 20,
                         ),
@@ -173,30 +257,9 @@ class _TestScreenState extends State<TestScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'PL',
+                          'Wins',
                           style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'W',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'D',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'L',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'GD',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'Pts',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                        )],
                     ),
                   ),
                 ],
@@ -207,7 +270,7 @@ class _TestScreenState extends State<TestScreen> {
             ),
 
             // buildTable(),
-
+            showTeams(),
           ],
         ),
       ),

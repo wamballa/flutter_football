@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_football_api/Screens/tablescreen.dart';
 import 'package:flutter_football_api/Screens/testscreen.dart';
 import 'package:flutter_football_api/Widgets/LeagueContainer.dart';
 
@@ -57,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TestScreen(code: '2021'),
+                              builder: (context) => TestScreen(code: 'PL'),
                             ));
                       },
                     ),
@@ -67,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TableScreen(code: 'PD'),
+                              builder: (context) => TestScreen(code: 'PD'),
                             ));
                       },
                     ),
@@ -77,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TableScreen(code: 'BL1'),
+                              builder: (context) => TestScreen(code: 'BL1'),
                             ));
                       },
                     ),
@@ -87,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TableScreen(code: 'SA'),
+                              builder: (context) => TestScreen(code: 'SA'),
                             ));
                       },
                     ),
@@ -97,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TableScreen(code: 'FL1'),
+                              builder: (context) => TestScreen(code: 'FL1'),
                             ));
                       },
                     ),
@@ -107,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TableScreen(code: 'PPL'),
+                              builder: (context) => TestScreen(code: 'PPL'),
                             ));
                       },
                     ),
